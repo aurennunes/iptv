@@ -12,12 +12,13 @@ import (
 func main() {
 	godotenv.Load()
 
+	baseDIR := os.Getenv("BASE_DIR")
 	baseURL := os.Getenv("XTREAM_URL")
 	username := os.Getenv("XTREAM_USER")
 	password := os.Getenv("XTREAM_PASS")
 
 	xtream := services.NewXtream(baseURL, username, password)
-	download := services.NewDownload(xtream, "/home/auren/Downloads")
+	download := services.NewDownload(xtream, baseDIR)
 
 	var seriesID int
 	fmt.Print("Digite o ID da série: ")
