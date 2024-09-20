@@ -123,3 +123,81 @@ func (d *Download) Serie(ID string) {
 		}
 	}
 }
+
+func (d *Download) SerieSeason(ID, seasonNum string) {
+	serieDetails, err := d.Xtream.GetSeriesDetails(ID)
+
+	if err != nil {
+		fmt.Printf("Erro ao obter informações da série: %v\n", err)
+		return
+	}
+
+	// Cria uma pasta para a série
+	seriesDir := serieDetails.Info.Name
+	err = d.createDirIfNotExists(seriesDir)
+	if err != nil {
+		fmt.Printf("Erro ao criar pasta da série: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Baixando série: %s\n", serieDetails.Info.Name)
+
+	if episodes := serieDetails.Episodes[seasonNum]; len(episodes) > 0 {
+		seasonDir := path.Join(seriesDir, "Temporada_"+seasonNum)
+
+		err := d.createDirIfNotExists(seasonDir)
+		if err != nil {
+			fmt.Printf("Erro ao criar pasta da temporada: %v\n", err)
+			return
+		}
+
+		for _, episode := range episodes {
+			fmt.Printf("Baixando episódio: %s (Temporada %s)\n", episode.Title, seasonNum)
+			if err := d.downloadEpisode(episode, seasonDir); err != nil {
+				fmt.Printf("Erro ao baixar episódio %s: %v\n", episode.Title, err)
+			} else {
+				fmt.Printf("Episódio %s baixado com sucesso!\n", episode.Title)
+			}
+		}
+	}
+}
+
+func (d *Download) SerieSeasonEpisode(ID, seasonNum, episodeNum string) {
+	serieDetails, err := d.Xtream.GetSeriesDetails(ID)
+
+	if err != nil {
+		fmt.Printf("Erro ao obter informações da série: %v\n", err)
+		return
+	}
+
+	// Cria uma pasta para a série
+	seriesDir := serieDetails.Info.Name
+	err = d.createDirIfNotExists(seriesDir)
+	if err != nil {
+		fmt.Printf("Erro ao criar pasta da série: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Baixando série: %s\n", serieDetails.Info.Name)
+
+	if episodes := serieDetails.Episodes[seasonNum]; len(episodes) > 0 {
+		seasonDir := path.Join(seriesDir, "Temporada_"+seasonNum)
+
+		err := d.createDirIfNotExists(seasonDir)
+		if err != nil {
+			fmt.Printf("Erro ao criar pasta da temporada: %v\n", err)
+			return
+		}
+
+		for _, episode := range episodes {
+			if episode.EpisodeNum == episodeNum {
+				fmt.Printf("Baixando episódio: %s (Temporada %s)\n", episode.Title, seasonNum)
+				if err := d.downloadEpisode(episode, seasonDir); err != nil {
+					fmt.Printf("Erro ao baixar episódio %s: %v\n", episode.Title, err)
+				} else {
+					fmt.Printf("Episódio %s baixado com sucesso!\n", episode.Title)
+				}
+			}
+		}
+	}
+}
